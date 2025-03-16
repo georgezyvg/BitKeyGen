@@ -34,7 +34,7 @@ BitKeyGen is a Python script that generates Bitcoin private keys, Wallet Import 
 1. **Set the Number of Keys**:
    Open the `main.py` file and modify the `num_keys` variable to specify how many keys you want to generate. For example:
    ```python
-   num_keys = 10  # Generate 10 keys
+   num_keys = 10  # Generate 10 keys(Maximum:115792089237316195423570985008687907852837564279074904382605163141518161494336
    ```
 
 2. **Run the Script**:
