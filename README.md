@@ -11,6 +11,7 @@
 - **Address Derivation**: Derives Bitcoin addresses from private keys using elliptic curve cryptography.
 - **File Storage**: Saves generated keys to a `wallet.json` file for easy access and backup.
 - **Graceful Interrupt Handling**: Saves the wallet even if the program is interrupted with `Ctrl+C`.
+- **Address Activity Checker**: Includes a `check_wallet_address` program to verify which addresses have transactions.
 
 ---
 
@@ -37,6 +38,7 @@
 
 ## Usage
 
+### 1. **Generate Keys**
 1. **Set the Number of Keys**:
    When prompted, enter the number of keys you want to generate.
 
@@ -49,16 +51,28 @@
 3. **Interrupt Handling**:
    If you press `Ctrl+C`, the program will save the current state of the wallet to `wallet.json` before exiting.
 
+### 2. **Check Address Activity**
+The `check_wallet_address` program checks which addresses in `wallet.json` have transactions using the Bitcoin Explorer API.
+
+1. **Run the Checker**:
+   ```bash
+   python check_wallet_address.py
+   ```
+
+2. **Output**:
+   - Addresses with transactions are saved to `found.txt`.
+   - The program prints the status of each address (active or inactive).
+
 ---
 
 ## Example
 
-### Input:
+### Input (Key Generation):
 ```
 Enter the number of keys to generate: 5
 ```
 
-### Output:
+### Output (Key Generation):
 ```
 Generating 5 keys...
 Generated key 1/5: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
@@ -83,6 +97,25 @@ Wallet saved to wallet.json.
         "address": "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
     }
 ]
+```
+
+### Input (Address Checker):
+```
+python check_wallet_address.py
+```
+
+### Output (Address Checker):
+```
+Loaded 2 addresses from wallet.json.
+Checking address: 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
+Address 1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa has transactions. Saving to found.txt.
+Checking address: 1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs
+Address 1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs has no transactions.
+```
+
+### `found.txt`:
+```
+1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa
 ```
 
 ---
