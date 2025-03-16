@@ -47,45 +47,47 @@ def check_address_transactions(address):
 
     return False
 
-def save_found_address(address):
+def save_found_address(address, wif):
     """
-    Save the address to the found.txt file.
+    Save the address and WIF to the found.txt file.
     """
     with open(OUTPUT_FILE, "a") as f:
-        f.write(f"{address}\n")
+        f.write(f"Address: {address}, WIF: {wif}\n")
 
-def load_wallet_addresses(wallet_file):
+def load_wallet_data(wallet_file):
     """
-    Load Bitcoin addresses from the wallet.json file.
+    Load Bitcoin addresses and WIFs from the wallet.json file.
     """
     with open(wallet_file, "r") as f:
         wallet_data = json.load(f)
-    return [entry["address"] for entry in wallet_data]
+    return wallet_data  # List of dictionaries containing "address" and "wif"
 
-def check_addresses_parallel(addresses):
+def check_addresses_parallel(wallet_data):
     """
     Check addresses in parallel using multiple threads.
     """
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        future_to_address = {executor.submit(check_address_transactions, address): address for address in addresses}
+        future_to_address = {executor.submit(check_address_transactions, entry["address"]): entry for entry in wallet_data}
         for future in concurrent.futures.as_completed(future_to_address):
-            address = future_to_address[future]
+            entry = future_to_address[future]
+            address = entry["address"]
+            wif = entry["wif"]
             try:
                 if future.result():
                     print(f"Address {address} has transactions. Saving to found.txt.")
-                    save_found_address(address)
+                    save_found_address(address, wif)
                 else:
                     print(f"Address {address} has no transactions.")
             except Exception as e:
                 print(f"Error checking address {address}: {e}")
 
 def main():
-    # Load addresses from wallet.json
-    addresses_to_check = load_wallet_addresses(WALLET_FILE)
-    print(f"Loaded {len(addresses_to_check)} addresses from {WALLET_FILE}.")
+    # Load wallet data from wallet.json
+    wallet_data = load_wallet_data(WALLET_FILE)
+    print(f"Loaded {len(wallet_data)} addresses from {WALLET_FILE}.")
 
     # Check addresses in parallel
-    check_addresses_parallel(addresses_to_check)
+    check_addresses_parallel(wallet_data)
 
 if __name__ == "__main__":
     main()
