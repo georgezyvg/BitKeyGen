@@ -14,7 +14,7 @@ BitKeyGen is a Python script that generates Bitcoin private keys, Wallet Import 
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/your-username/BitKeyGen.git
+   git clone https://github.com/HugoXOX3/BitKeyGen.git
    cd BitKeyGen
    ```
 
