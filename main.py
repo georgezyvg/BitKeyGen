@@ -1,19 +1,38 @@
-import ecdsa
-import hashlib
-import json
 import random
 import base58
+import hashlib
+import ecdsa
+import json
 import signal
 import sys
+import os
 
 # Define the maximum possible private key value
 MAX_PRIVATE_KEY = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364140
 
-# File to save the wallet
+# Files to save the wallet and all WIFs
 WALLET_FILE = "wallet.json"
+ALL_WIFS_FILE = "all.txt"  # Changed to .txt for plain text format
 
-# Global variable to store the wallet data
+# Global variables to store the wallet data and all WIFs
 wallet = []
+all_wifs = []
+
+def load_all_wifs():
+    """Load all previously generated WIFs from all.txt."""
+    global all_wifs
+    if os.path.exists(ALL_WIFS_FILE):
+        with open(ALL_WIFS_FILE, "r") as f:
+            all_wifs = f.read().splitlines()  # Read WIFs as lines
+    else:
+        all_wifs = []
+
+def save_all_wifs():
+    """Save all WIFs to all.txt (one WIF per line)."""
+    with open(ALL_WIFS_FILE, "w") as f:
+        for wif in all_wifs:
+            f.write(f"{wif}\n")  # Write each WIF on a new line
+    print(f"\nAll WIFs saved to {ALL_WIFS_FILE}.")
 
 def generate_private_key():
     """Generate a random private key within the valid range."""
@@ -56,36 +75,49 @@ def save_wallet():
 
 def signal_handler(sig, frame):
     """Handle Ctrl+C interruption."""
-    print("\nCtrl+C detected. Saving wallet before exiting...")
+    print("\nCtrl+C detected. Saving wallet and all WIFs before exiting...")
     save_wallet()
+    save_all_wifs()
     sys.exit(0)
 
 def generate_wallet(num_keys):
     """Generate the specified number of keys and add them to the wallet."""
-    global wallet
+    global wallet, all_wifs
     for i in range(num_keys):
         private_key = generate_private_key()
         wif = private_key_to_wif(private_key)
         address = private_key_to_address(private_key)
-        
+
+        # Add to wallet
         wallet.append({
             "private_key": hex(private_key),
             "wif": wif,
             "address": address
         })
-        
+
+        # Add to all WIFs
+        all_wifs.append(wif)
+
         print(f"Generated key {i + 1}/{num_keys}: {address}")
 
 if __name__ == "__main__":
+    # Load all previously generated WIFs
+    load_all_wifs()
+
     # Register the signal handler for Ctrl+C
     signal.signal(signal.SIGINT, signal_handler)
 
     # Number of private keys to generate
-    num_keys = int(input("Enter the number of keys to generate(MAX:115792089237316195423570985008687907852837564279074904382605163141518161494336): "))
+    try:
+        num_keys = int(input("Enter the number of keys to generate: "))
+    except ValueError:
+        print("Invalid input. Please enter a valid number.")
+        sys.exit(1)
 
     # Generate the wallet
     print(f"Generating {num_keys} keys...")
     generate_wallet(num_keys)
 
-    # Save the wallet to the file
+    # Save the wallet and all WIFs
     save_wallet()
+    save_all_wifs()
