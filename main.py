@@ -36,7 +36,7 @@ def save_all_wifs():
 
 def generate_private_key():
     """Generate a random private key within the valid range."""
-    return random.randint(1, MAX_PRIVATE_KEY)
+    return random.randint(18e14a7b6a307f426a94f8114701e7c8e774e7f9a47e2c2035db29a206321724, MAX_PRIVATE_KEY)
 
 def private_key_to_wif(private_key):
     """Convert the private key to Wallet Import Format (WIF)."""
